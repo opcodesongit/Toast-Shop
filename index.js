@@ -1,18 +1,24 @@
 const express = require('express');
 const app = express();
+const path = require('path');
 const port = 3000;
 const Database = require("@replit/database")
 const db = new Database()
 
 
-app.get('/', (req, res) => res.send('Bot Online')); // Tells when the bot is online
+app.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname, '/index.html'));
+});
+app.get('/images/logo', function(req, res) {
+  res.sendFile(path.join(__dirname, '/images/Logo3Trans.png'));
+});
 
 app.listen(port, () => console.log(`App port online!`)); // Tells when the port is up
 
 // ================= START BOT CODE ===================
 const Discord = require('discord.js');
 const client = new Discord.Client(); // Makes a new Discord Client
-const version = "0.90.0 BETA"
+const version = "1.0.0"
 
 const prefix = "toast "
 
@@ -208,6 +214,16 @@ client.on('message', message => {
 
   // Command Start
 
+  if (command == 'import'){
+    if (message.author.id == "607341305994936320"){
+      db.set(args[0], args[1])
+      message.reply("Set " + args[0] + " with " + args[1] + "!")
+    }
+    if (message.author.id !== "607341305994936320"){
+      message.reply("You don't have permission to use this command. Please check your authority and try again.")
+    }
+  }
+
   if (command == 'online') {
       function getRandomInt(max) {
       return Math.floor(Math.random() * max);
@@ -217,7 +233,7 @@ client.on('message', message => {
     message.reply(online[num])
   }
   if (command == 'invite'){
-    message.reply("No way! I'm going to meet another server! I'm so excited! Here is my invite! https://discord.com/oauth2/authorize?client_id=981329232456192100&scope=bot&permissions=8 Thanks so much!")
+    message.reply("No way! I'm going to meet another server! I'm so excited! Here is my invite! https://discord.com/oauth2/authorize?client_id=981329232456192100&scope=bot&permissions=274877910080. Thanks so much!")
   }
   if (command == 'shop') {
     var user = message.author.id
@@ -669,7 +685,7 @@ client.on('message', message => {
 
                                 db.set(user + "toast", (Number(quality) + 1))
                                 db.set(user + "money", (Number(money) - Number(qualityfinder())))
-                                message.reply("You now own " + toastqualityfinder(Number(quality + 1)) + " quality!")
+                                message.reply("You now own " + toastqualityfinder(Number(quality) + 1) + " quality!")
 
                               }
                             } else if (emoji === '🧑') {
@@ -781,6 +797,23 @@ client.on('message', message => {
 
 
   // Command End
+})
+
+client.on('guildCreate', guild => {
+  if (guild.id == "852039823522136094"){
+    guild.leave()
+  }
+  else if (guild.id !== "852039823522136094"){
+    const channel = guild.channels.cache.find(channel => channel.type === 'text' && channel.permissionsFor(guild.me).has('SEND_MESSAGES'))
+const embed = new Discord.MessageEmbed()
+                .setColor('#FF7F27')
+                .setTitle('Thanks for inviting me!')
+                .setDescription('In order to start playing, take a look at the help menu, "toast help". Keep in mind that the prefix is "toast"')
+                .setTimestamp()
+                .setFooter('Created by op#1000, Version ' + version);
+
+              channel.send(embed);
+  }
 })
 
 client.on('disconnect', function(erMsg, code) {
